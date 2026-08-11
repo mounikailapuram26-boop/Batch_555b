@@ -98,7 +98,51 @@ elif option == "Update Student":
     st.subheader("✏️ Update Existing Student")
 
     student_id = st.number_input(
-... (48 lines left)
+        "Enter Student ID to Update", min_value=1, step=1
+    )
 
-message.txt
-6 KB
+    with st.form("update_student_form"):
+        name = st.text_input("Updated Name")
+        age = st.number_input("Updated Age", min_value=1, max_value=100, value=20)
+        course = st.text_input("Updated Course")
+
+        submit_button = st.form_submit_button("Update Student")
+
+        if submit_button:
+            payload = {"name": name, "age": age, "course": course}
+            try:
+                response = requests.put(
+                    f"{API_URL}/students/{student_id}", json=payload
+                )
+                data = response.json()
+
+                if "error" in data:
+                    st.warning(data["error"])
+                else:
+                    st.success(f"Student #{student_id} updated successfully!")
+                    st.json(data)
+            except Exception as e:
+                st.error(f"Connection error: {e}")
+
+# ==============================================================================
+# 5. DELETE STUDENT (DELETE)
+# ==============================================================================
+elif option == "Delete Student":
+    st.subheader("🗑️ Delete Student Record")
+
+    student_id = st.number_input(
+        "Enter Student ID to Delete", min_value=1, step=1
+    )
+
+    if st.button("Delete Student", type="primary"):
+        try:
+            response = requests.delete(f"{API_URL}/students/{student_id}")
+            data = response.json()
+
+            if "error" in data:
+                st.warning(data["error"])
+            else:
+                st.success(f"Student #{student_id} deleted successfully!")
+                st.json(data)
+        except Exception as e:
+            st.error(f"Connection error: {e}")
